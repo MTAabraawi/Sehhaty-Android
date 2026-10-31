@@ -10,7 +10,7 @@
     <string name="auth_offline_note">Offline mode: All data and reminders work 100% locally on your device.</string>
 
     <!-- Navigation -->
-    <string name="nav_home">Today's Doses</string>
+    <string name="nav_home">Today&apos;s Doses</string>
     <string name="nav_search">Drug Search</string>
     <string name="nav_history">History</string>
     <string name="nav_supervisor">Family Care</string>
