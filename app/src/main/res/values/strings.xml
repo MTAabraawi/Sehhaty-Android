@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">Sehhaty</string>
+    <string name="company_name">MTA TECHNOLOGIES</string>
+    <string name="tagline">Your Trusted Medication &amp; Health Companion</string>
+
+    <!-- Auth & Welcome -->
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="sign_in_guest">Continue in Offline Mode</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="auth_offline_note">Offline mode: All data and reminders work 100% locally on your device.</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Today's Doses</string>
+    <string name="nav_search">Drug Search</string>
+    <string name="nav_history">History</string>
+    <string name="nav_supervisor">Family Care</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Dose & Medications -->
+    <string name="add_medication">Add Medication</string>
+    <string name="edit_medication">Edit Medication</string>
+    <string name="medication_name">Medication Name</string>
+    <string name="dosage">Dosage / Strength</string>
+    <string name="frequency">Frequency per day</string>
+    <string name="dose_time">Dose Time</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date (Optional)</string>
+    <string name="notes">Notes / Instructions</string>
+    <string name="status_pending">Upcoming</string>
+    <string name="status_due">Due Now</string>
+    <string name="status_taken">Confirmed Taken</string>
+    <string name="status_unconfirmed">Not Confirmed</string>
+    <string name="btn_take_dose">Mark as Taken</string>
+    <string name="btn_snooze">Snooze (10 min)</string>
+    <string name="dose_confirmed_msg">Dose confirmed. Next dose scheduled.</string>
+
+    <!-- Family Supervisor -->
+    <string name="supervisor_title">Family Supervisor</string>
+    <string name="supervisor_name">Supervisor Name</string>
+    <string name="supervisor_relation">Relationship</string>
+    <string name="supervisor_phone">Phone Number</string>
+    <string name="supervisor_whatsapp">WhatsApp Number</string>
+    <string name="supervisor_consent">I consent to sharing dose confirmation status with this contact</string>
+    <string name="supervisor_alert_delay">Alert delay after missed dose (Minutes)</string>
+    <string name="supervisor_alert_msg">Alert from Sehhaty: The scheduled medication dose was not confirmed at its designated time. Please contact the account holder to check on them.</string>
+    <string name="send_whatsapp_alert">Send WhatsApp Check-in Alert</string>
+
+    <!-- Drug Search & AI Vision -->
+    <string name="search_medication_hint">Search by trade name, generic or ingredient...</string>
+    <string name="camera_scan_box">Scan Box with Camera</string>
+    <string name="camera_scan_leaflet">Scan Leaflet / Prescription</string>
+    <string name="medical_disclaimer_title">Important Medical Disclaimer</string>
+    <string name="medical_disclaimer_body">This information is for guidance based on official drug formularies. It does NOT replace medical consultation with your doctor or pharmacist. Never change or stop prescribed doses without professional consultation.</string>
+
+    <!-- Settings -->
+    <string name="battery_optimization_title">Battery Optimization Settings</string>
+    <string name="battery_optimization_desc">To ensure reminders trigger precisely every 2 minutes when due, allow Sehhaty to run unrestricted in battery settings.</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="delete_account">Delete Account &amp; Local Data</string>
+</resources>

@@ -1,0 +1,25 @@
+<resources>
+    <!-- Brand Identity Palette (Derived directly from official Sehhaty logo) -->
+    <color name="brand_teal">#088395</color>
+    <color name="brand_navy">#0A4D68</color>
+    <color name="brand_cyan">#05BFDB</color>
+    <color name="brand_mint">#00FFCA</color>
+    <color name="brand_amber">#F59E0B</color>
+    <color name="brand_coral">#F97316</color>
+
+    <!-- Surface & Background -->
+    <color name="surface_background">#F8FAFC</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="surface_subtle">#F1F5F9</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#94A3B8</color>
+
+    <!-- Status Colors -->
+    <color name="status_success">#10B981</color>
+    <color name="status_warning">#F59E0B</color>
+    <color name="status_danger">#EF4444</color>
+    <color name="status_info">#0284C7</color>
+</resources>

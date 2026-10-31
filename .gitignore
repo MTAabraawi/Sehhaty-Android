@@ -1,0 +1,25 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+# Keystore secrets (never commit!)
+*.jks
+*.keystore
+secrets.properties
+
+# Local Firebase backup - never upload
+/app/google-services-before-oauth-backup.json
+
+# Local review backups - never upload
+*.before-*

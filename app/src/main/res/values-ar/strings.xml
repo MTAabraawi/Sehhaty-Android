@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">صحتي</string>
+    <string name="company_name">MTA TECHNOLOGIES</string>
+    <string name="tagline">رفيقك الصحي الموثوق لتنظيم الأدوية والجرعات</string>
+
+    <!-- Auth & Welcome -->
+    <string name="sign_in_google">تسجيل الدخول باستخدام Google</string>
+    <string name="sign_in_guest">المتابعة في الوضع المحلي (بدون إنترنت)</string>
+    <string name="sign_out">تسجيل الخروج</string>
+    <string name="auth_offline_note">الوضع المحلي: جميع التذكيرات وسجلات الأدوية تعمل 100% محليًا على هاتفك دون حاجة للإنترنت.</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">جرعات اليوم</string>
+    <string name="nav_search">البحث الدوائي</string>
+    <string name="nav_history">سجل الجرعات</string>
+    <string name="nav_supervisor">مشرف الأسرة</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Dose & Medications -->
+    <string name="add_medication">إضافة دواء جديد</string>
+    <string name="edit_medication">تعديل بيانات الدواء</string>
+    <string name="medication_name">اسم الدواء</string>
+    <string name="dosage">التركيز والجرعة</string>
+    <string name="frequency">عدد المرات يوميًا</string>
+    <string name="dose_time">موعد الجرعة</string>
+    <string name="start_date">تاريخ بداية العلاج</string>
+    <string name="end_date">تاريخ نهاية العلاج (اختياري)</string>
+    <string name="notes">ملاحظات وتعليمات الاستخدام</string>
+    <string name="status_pending">بانتظار الموعد</string>
+    <string name="status_due">حان موعد الجرعة</string>
+    <string name="status_taken">تم تأكيد تناول الجرعة</string>
+    <string name="status_unconfirmed">لم يتم تأكيد الجرعة</string>
+    <string name="btn_take_dose">تم تناول الجرعة</string>
+    <string name="btn_snooze">تأجيل 10 دقائق</string>
+    <string name="dose_confirmed_msg">تم تأكيد الجرعة بنجاح وإيقاف تذكيراتها.</string>
+
+    <!-- Family Supervisor -->
+    <string name="supervisor_title">مشرف الأسرة للمتابعة</string>
+    <string name="supervisor_name">اسم المشرف</string>
+    <string name="supervisor_relation">صلة القرابة</string>
+    <string name="supervisor_phone">رقم الهاتف</string>
+    <string name="supervisor_whatsapp">رقم الواتساب مع رمز الدولة</string>
+    <string name="supervisor_consent">أوافق على إخطار المشرف بحالة الجرعات عند عدم التأكيد</string>
+    <string name="supervisor_alert_delay">مدة الانتظار قبل إشعار المشرف (بالدقائق)</string>
+    <string name="supervisor_alert_msg">تنبيه من تطبيق صحتي: لم يتم تأكيد تناول الجرعة المسجلة في موعدها. يرجى التواصل مع صاحب الحساب للاطمئنان عليه.</string>
+    <string name="send_whatsapp_alert">إرسال تنبيه الاطمئنان عبر واتساب</string>
+
+    <!-- Drug Search & AI Vision -->
+    <string name="search_medication_hint">ابحث بالاسم التجاري أو العلمي أو المادة الفعالة...</string>
+    <string name="camera_scan_box">تصوير علبة الدواء بالكاميرا</string>
+    <string name="camera_scan_leaflet">تصوير النشرة الدوائية أو الروشتة</string>
+    <string name="medical_disclaimer_title">تنبيه طبي وأخلاقي مهم</string>
+    <string name="medical_disclaimer_body">هذه المعلومات مصدرها النشرات الدوائية الرسمية المعتمدة، ولا تغني أبدًا عن استشارة الطبيب المعالج أو الصيدلي. لا تقم بتغيير الجرعة أو إيقاف الدواء دون الرجوع لطبيبك.</string>
+
+    <!-- Settings -->
+    <string name="battery_optimization_title">إعدادات البطارية والتذكيرات</string>
+    <string name="battery_optimization_desc">لضمان رنين التذكير بدقة كل دقيقتين حتى تأكيد الجرعة، يرجى استثناء تطبيق صحتي من قيود توفير الطاقة.</string>
+    <string name="privacy_policy">سياسة الخصوصية والأمان</string>
+    <string name="delete_account">حذف الحساب والبيانات المحلية نهائيًا</string>
+</resources>

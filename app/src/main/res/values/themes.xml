@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Sehhaty" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#0A4D68</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

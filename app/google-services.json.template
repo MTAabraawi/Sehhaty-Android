@@ -1,0 +1,30 @@
+{
+  "_comment": "ضع ملف google-services.json الحقيقي هنا بعد تنزيله من Firebase Console",
+  "project_info": {
+    "project_number": "123456789012",
+    "project_id": "sehhaty-app",
+    "storage_bucket": "sehhaty-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
+        "android_client_info": {
+          "package_name": "com.mtaapps.sehhaty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDummyKeyReplaceWithYourRealKey"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
