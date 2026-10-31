@@ -112,7 +112,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play-services)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Firebase (BoM guarantees version compatibility)
     implementation(platform(libs.firebase.bom))
