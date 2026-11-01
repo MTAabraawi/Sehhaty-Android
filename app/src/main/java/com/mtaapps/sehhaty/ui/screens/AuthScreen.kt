@@ -119,7 +119,7 @@ fun AuthScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher),
+                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
                         contentDescription = "شعار صحتي",
                         modifier = Modifier.size(68.dp).clip(RoundedCornerShape(16.dp))
                     )
