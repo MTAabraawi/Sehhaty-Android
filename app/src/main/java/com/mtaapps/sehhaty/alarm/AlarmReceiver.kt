@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import com.mtaapps.sehhaty.SehhatyApp
 import com.mtaapps.sehhaty.data.local.entity.DoseStatus
-import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import com.mtaapps.sehhaty.supervisor.SupervisorAlertManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,15 +33,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val activeUserId = FirebaseSyncService.getActiveUserId(context)
-                if (activeUserId == null) {
-                    Log.w("AlarmReceiver", "No active session. Ignoring dose alarm $doseId.")
-                    alarmScheduler.cancelRepeatAlarm(doseId)
-                    NotificationHelper.cancelNotification(context, doseId.toInt())
-                    return@launch
-                }
-
-                val dose = database.doseDao().getDoseById(doseId, activeUserId)
+                val dose = database.doseDao().getDoseById(doseId)
                 if (dose == null) {
                     Log.w("AlarmReceiver", "Dose $doseId not found in database. Cancelling alarm.")
                     alarmScheduler.cancelRepeatAlarm(doseId)
@@ -64,11 +55,8 @@ class AlarmReceiver : BroadcastReceiver() {
                 if (currentRepeats >= MAX_REPEAT_COUNT) {
                     Log.i("AlarmReceiver", "Max reminder repeats ($MAX_REPEAT_COUNT) reached for dose $doseId.")
                     alarmScheduler.cancelRepeatAlarm(doseId)
-                    database.doseDao().updateScheduleState(
-                        id = dose.id,
-                        userId = dose.userId,
-                        status = DoseStatus.UNCONFIRMED,
-                        supervisorAlerted = dose.supervisorAlerted
+                    database.doseDao().updateSchedule(
+                        dose.copy(status = DoseStatus.UNCONFIRMED)
                     )
                     // Escalate to family supervisor if configured
                     SupervisorAlertManager.checkAndEscalateIfNeeded(
@@ -81,7 +69,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 }
 
                 // Increment repeat count
-                database.doseDao().incrementRepeat(doseId, activeUserId)
+                database.doseDao().incrementRepeat(doseId)
 
                 // Trigger High-Priority Alarm Notification with Take / Snooze Action Buttons
                 NotificationHelper.showDoseNotification(

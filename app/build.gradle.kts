@@ -2,8 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.firebase.crashlytics)
 }
 
 // Safely apply google-services only if google-services.json exists
@@ -98,7 +96,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
-
+    
     // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -111,22 +109,20 @@ dependencies {
     // Room Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.coroutines.play-services)
 
     // Firebase (BoM guarantees version compatibility)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation(libs.firebase.crashlytics)
 
     // Google Play Services & AdMob
-    implementation(libs.play.services.auth)
-    implementation(libs.play.services.ads)
+    implementation(libs.play-services-auth)
+    implementation(libs.play-services-ads)
 
     // Unit Testing
     testImplementation(libs.junit)

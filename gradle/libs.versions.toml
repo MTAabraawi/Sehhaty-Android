@@ -1,7 +1,6 @@
 [versions]
 agp = "8.7.1"
 kotlin = "2.0.21"
-ksp = "2.0.21-1.0.28"
 coreKtx = "1.15.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
@@ -11,7 +10,6 @@ coroutines = "1.9.0"
 navigationCompose = "2.8.3"
 firebaseBom = "33.5.1"
 googleServices = "4.4.2"
-firebaseCrashlytics = "3.0.2"
 playServicesAuth = "21.2.0"
 playServicesAds = "23.4.0"
 junit = "4.13.2"
@@ -48,7 +46,6 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
 # Play Services & AdMob
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
@@ -60,9 +57,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }

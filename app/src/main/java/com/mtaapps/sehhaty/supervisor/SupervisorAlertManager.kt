@@ -4,14 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.mtaapps.sehhaty.SehhatyApp
-import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import com.mtaapps.sehhaty.data.local.entity.DoseStatus
 import java.net.URLEncoder
 
 /**
  * Handles family supervisor notification and WhatsApp alert escalation.
- * Respects medical ethics: Phrases alert as "لم يتم تأكيد الجرعة" (Dose not confirmed)
- * rather than assuming the patient did not take it.
+ * Uses official WhatsApp URI intent with direct package targeting ("com.whatsapp").
+ *
+ * Android & WhatsApp Security/Privacy Note:
+ * WhatsApp does NOT provide an official background API to send messages silently from
+ * a personal WhatsApp account without user initiation. The closest official, safe, and legal
+ * flow is pre-filling the chat with the verified phone number and message so the user only
+ * taps the send arrow (1-tap).
  */
 object SupervisorAlertManager {
 
@@ -22,9 +26,8 @@ object SupervisorAlertManager {
         doseStrength: String
     ) {
         val database = SehhatyApp.instance.database
-        val activeUserId = FirebaseSyncService.getActiveUserId(context) ?: return
-        val dose = database.doseDao().getDoseById(doseId, activeUserId) ?: return
-        val supervisor = database.supervisorDao().getSupervisorSync(dose.userId) ?: return
+        val supervisor = database.supervisorDao().getSupervisorSync("local_user") ?: return
+        val dose = database.doseDao().getDoseById(doseId) ?: return
 
         if (!supervisor.isActive || !supervisor.consentGiven) return
         if (dose.status == DoseStatus.CONFIRMED || dose.supervisorAlerted) return
@@ -33,18 +36,12 @@ object SupervisorAlertManager {
         val elapsedSinceSchedule = System.currentTimeMillis() - dose.scheduledTimeTimestamp
 
         if (elapsedSinceSchedule >= delayMillis) {
-            // Threshold reached! Mark as alerted to prevent spam
-            database.doseDao().updateScheduleState(
-                id = dose.id,
-                userId = dose.userId,
-                status = DoseStatus.UNCONFIRMED,
-                supervisorAlerted = true
-            )
+            database.doseDao().updateSchedule(dose.copy(supervisorAlerted = true, status = DoseStatus.UNCONFIRMED))
         }
     }
 
     /**
-     * Builds official respectful WhatsApp intent message.
+     * Builds official respectful WhatsApp intent message targeted directly to WhatsApp client.
      */
     fun createWhatsAppIntent(
         supervisorPhoneWithCountryCode: String,
@@ -55,8 +52,12 @@ object SupervisorAlertManager {
         val message = "تنبيه من تطبيق صحتي: لم يتم تأكيد تناول الجرعة المسجلة لدواء ($medicationName - $doseStrength) في موعدها. يرجى التواصل مع صاحب الحساب للاطمئنان عليه."
         val encodedMessage = URLEncoder.encode(message, "UTF-8")
         val uri = Uri.parse("https://api.whatsapp.com/send?phone=$cleanNumber&text=$encodedMessage")
-        return Intent(Intent.ACTION_VIEW, uri).apply {
+
+        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            // Direct package targeting for immediate opening in WhatsApp
+            setPackage("com.whatsapp")
         }
+        return intent
     }
 }

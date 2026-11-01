@@ -12,20 +12,7 @@
           "package_name": "com.mtaapps.sehhaty"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "777465124662-tset05g5dtfv8lq28vcaabh4n3apg238.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.mtaapps.sehhaty",
-            "certificate_hash": "681ee2c39e5cc11a458c89b8f3c664a3185e8511"
-          }
-        },
-        {
-          "client_id": "777465124662-6jh7tbg4oaksti5mj5729nqoisbrtpfu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyD59O2K5BugDfYc8Y2-5fTidGSQJHKwfmE"
@@ -33,12 +20,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "777465124662-6jh7tbg4oaksti5mj5729nqoisbrtpfu.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

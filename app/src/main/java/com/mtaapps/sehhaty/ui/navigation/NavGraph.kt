@@ -7,32 +7,22 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import android.content.Context
-import com.google.firebase.auth.FirebaseAuth
-import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
+import com.google.firebase.auth.FirebaseAuth
 import com.mtaapps.sehhaty.ui.screens.*
-import com.mtaapps.sehhaty.ui.theme.BrandNavy
 import com.mtaapps.sehhaty.ui.theme.BrandTeal
 
 @Composable
 fun AppNavGraph() {
-    val context = LocalContext.current
-    val preferences = remember {
-        context.getSharedPreferences("sehhaty_session", Context.MODE_PRIVATE)
-    }
-    val hasSession = remember {
-        (FirebaseSyncService.isFirebaseConfigured &&
-            FirebaseAuth.getInstance().currentUser != null) ||
-            preferences.getBoolean("local_mode_enabled", false)
-    }
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    // Check if user is authenticated; session is cached locally by Firebase Auth
+    val isAuthenticated = FirebaseAuth.getInstance().currentUser != null
+    val startDestination = if (isAuthenticated) Screen.Home.route else Screen.Auth.route
 
     val showBottomBar = currentRoute in listOf(
         Screen.Home.route,
@@ -46,7 +36,7 @@ fun AppNavGraph() {
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     tonalElevation = 8.dp,
                     modifier = Modifier.clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                 ) {
@@ -111,48 +101,33 @@ fun AppNavGraph() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = if (hasSession) Screen.Home.route else Screen.Auth.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Auth.route) {
                 AuthScreen(
                     onAuthSuccess = {
-                        preferences.edit().putBoolean("local_mode_enabled", false).apply()
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Auth.route) { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    },
-                    onContinueOffline = {
-                        preferences.edit().putBoolean("local_mode_enabled", true).apply()
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Auth.route) { inclusive = true }
-                            launchSingleTop = true
                         }
                     }
                 )
             }
             composable(Screen.Home.route) {
                 HomeScreen(
-                    userId = FirebaseSyncService.currentUserId ?: "local_user",
                     onAddMedicationClick = { navController.navigate(Screen.AddMedication.route) },
                     onSearchClick = { navController.navigate(Screen.DrugSearch.route) },
                     onSupervisorClick = { navController.navigate(Screen.Supervisor.route) }
                 )
             }
             composable(Screen.AddMedication.route) {
-                AddEditMedicationScreen(
-                    userId = FirebaseSyncService.currentUserId ?: "local_user",
-                    onSaved = { navController.popBackStack() }
-                )
+                AddEditMedicationScreen(onSaved = { navController.popBackStack() })
             }
             composable(Screen.DrugSearch.route) {
                 DrugSearchScreen()
             }
             composable(Screen.DoseHistory.route) {
-                DoseHistoryScreen(
-                    userId = FirebaseSyncService.currentUserId ?: "local_user"
-                )
+                DoseHistoryScreen()
             }
             composable(Screen.Supervisor.route) {
                 SupervisorScreen()

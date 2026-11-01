@@ -18,6 +18,6 @@ interface SupervisorDao {
     @Update
     suspend fun updateSupervisor(supervisor: SupervisorEntity)
 
-    @Query("DELETE FROM family_supervisors WHERE id = :id AND userId = :userId")
-    suspend fun deleteSupervisor(id: Long, userId: String): Int
+    @Delete
+    suspend fun deleteSupervisor(supervisor: SupervisorEntity)
 }

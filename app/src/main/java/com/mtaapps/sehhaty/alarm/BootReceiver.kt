@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import com.mtaapps.sehhaty.SehhatyApp
 import com.mtaapps.sehhaty.data.local.entity.DoseStatus
-import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,25 +20,18 @@ class BootReceiver : BroadcastReceiver() {
         val action = intent.action
         if (action == Intent.ACTION_BOOT_COMPLETED ||
             action == Intent.ACTION_TIMEZONE_CHANGED ||
-            action == "android.intent.action.TIME_SET" ||
+            action == Intent.ACTION_TIME_SET ||
             action == Intent.ACTION_MY_PACKAGE_REPLACED
         ) {
             val pendingResult = goAsync()
             val database = SehhatyApp.instance.database
             val scheduler = AlarmScheduler(context)
-            val activeUserId = FirebaseSyncService.getActiveUserId(context)
-
-            if (activeUserId == null) {
-                Log.i("BootReceiver", "No active user session; skipping alarm restoration.")
-                pendingResult.finish()
-                return
-            }
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val now = System.currentTimeMillis()
-                    // Restore pending alarms only for the active account.
-                    val upcomingDoses = database.doseDao().getUpcomingDoses(activeUserId, now, DoseStatus.PENDING)
+                    // Fetch upcoming pending doses from Room database
+                    val upcomingDoses = database.doseDao().getUpcomingDoses(now, DoseStatus.PENDING)
                     for (dose in upcomingDoses) {
                         scheduler.scheduleExactDoseAlarm(
                             doseId = dose.id,

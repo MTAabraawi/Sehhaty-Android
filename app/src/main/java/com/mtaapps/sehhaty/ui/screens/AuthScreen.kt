@@ -34,27 +34,31 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.mtaapps.sehhaty.R
 import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import com.mtaapps.sehhaty.ui.theme.*
-import kotlinx.coroutines.launch
 
 /**
  * Authentication Screen.
- * Provides:
- * 1. Real Google Sign-In (using default_web_client_id if configured in Firebase).
- * 2. Real Firebase Email/Password Sign-In & Registration.
- * 3. 100% Offline Local Mode without cloud dependency.
+ * - Requires real sign-in (Google or Firebase Email).
+ * - "Continue in offline mode" guest button is completely REMOVED.
+ * - Does NOT navigate to Home until authentication is genuinely verified.
+ * - Sessions are cached by Firebase Auth locally across app restarts.
  */
 @Composable
 fun AuthScreen(
-    onAuthSuccess: () -> Unit,
-    onContinueOffline: () -> Unit
+    onAuthSuccess: () -> Unit
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showEmailForm by remember { mutableStateOf(false) }
+
+    // If already authenticated, proceed directly
+    LaunchedEffect(Unit) {
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            onAuthSuccess()
+        }
+    }
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -64,34 +68,36 @@ fun AuthScreen(
             try {
                 val account = task.getResult(ApiException::class.java)
                 val idToken = account?.idToken
-                if (idToken != null) {
+                if (!idToken.isNullOrBlank()) {
                     val credential = GoogleAuthProvider.getCredential(idToken, null)
                     FirebaseAuth.getInstance().signInWithCredential(credential)
                         .addOnCompleteListener { authTask ->
                             isLoading = false
-                            if (authTask.isSuccessful) {
+                            if (authTask.isSuccessful && FirebaseAuth.getInstance().currentUser != null) {
                                 onAuthSuccess()
                             } else {
-                                errorMessage = "فشل تسجيل الدخول بـ Google: " + (authTask.exception?.localizedMessage ?: "")
+                                errorMessage = "فشل ربط الحساب بـ Firebase: " + (authTask.exception?.localizedMessage ?: "حاول مجدداً")
                             }
                         }
                 } else {
                     isLoading = false
-                    errorMessage = "تعذر استلام رمز مصادقة Google."
+                    errorMessage = "تعذر استلام رمز مصادقة Google (ID Token). يرجى التأكد من ربط بصمة SHA-1 في Firebase Console أو استخدام البريد الإلكتروني أدناه."
+                    showEmailForm = true
                 }
             } catch (e: ApiException) {
                 isLoading = false
-                errorMessage = "خطأ في الاتصال بـ Google (" + e.statusCode + ")"
+                errorMessage = "خطأ في الاتصال بـ Google (" + e.statusCode + "): " + (e.localizedMessage ?: "تم إلغاء تسجيل الدخول")
             }
         } else {
             isLoading = false
+            errorMessage = "تم إلغاء تسجيل الدخول أو تعذر إتمامه. يرجى المحاولة مجدداً."
         }
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgNeutral),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -99,7 +105,7 @@ fun AuthScreen(
                 .fillMaxWidth(0.92f)
                 .wrapContentHeight(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Column(
@@ -119,7 +125,7 @@ fun AuthScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        painter = painterResource(id = R.mipmap.ic_launcher),
                         contentDescription = "شعار صحتي",
                         modifier = Modifier.size(68.dp).clip(RoundedCornerShape(16.dp))
                     )
@@ -130,7 +136,7 @@ fun AuthScreen(
                         text = "صحتي | Sehhaty",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = BrandNavy
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "MTA TECHNOLOGIES",
@@ -140,60 +146,44 @@ fun AuthScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "تسجيل الدخول يتيح المزامنة السحابية الآمنة وحفظ نسخ احتياطية لأدويتكم",
+                        text = "سجّل دخولك لربط حسابك الصحي؛ سيعمل التطبيق لاحقاً دون الحاجة للإنترنت.",
                         fontSize = 12.sp,
-                        color = TextMuted,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         lineHeight = 16.sp
                     )
                 }
 
-                Divider(color = Color(0xFFF1F5F9))
+                Divider(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
 
-                // Google Sign-In Button
+                // Real Google Sign-In Button
                 Button(
                     onClick = {
                         isLoading = true
                         errorMessage = null
-                        if (FirebaseSyncService.isFirebaseConfigured) {
-                            val webClientIdResId = context.resources.getIdentifier(
-                                "default_web_client_id", "string", context.packageName
-                            )
-                            val serverClientId = if (webClientIdResId != 0) {
-                                context.getString(webClientIdResId)
-                            } else {
-                                null
-                            }
 
-                            if (!serverClientId.isNullOrBlank()) {
-                                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                    .requestEmail()
-                                    .requestIdToken(serverClientId)
-                                    .build()
-                                val client = GoogleSignIn.getClient(context, gso)
-                                googleSignInLauncher.launch(client.signInIntent)
-                            } else {
-                                isLoading = false
-                                // Clear guidance if Web Client ID is not yet generated in Firebase Console
-                                showEmailForm = true
-                                Toast.makeText(
-                                    context,
-                                    "يمكنك تسجيل الدخول بالبريد الإلكتروني، أو إكمال إعداد Google Sign-In في Firebase Console",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        } else {
-                            isLoading = false
-                            onContinueOffline()
+                        val webClientIdResId = context.resources.getIdentifier(
+                            "default_web_client_id", "string", context.packageName
+                        )
+                        val serverClientId = if (webClientIdResId != 0) context.getString(webClientIdResId) else null
+
+                        val gsoBuilder = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestEmail()
+
+                        if (!serverClientId.isNullOrBlank()) {
+                            gsoBuilder.requestIdToken(serverClientId)
                         }
+
+                        val client = GoogleSignIn.getClient(context, gsoBuilder.build())
+                        googleSignInLauncher.launch(client.signInIntent)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(14.dp)),
+                        .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp)),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = TextDark
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
                     ),
                     shape = RoundedCornerShape(14.dp),
                     elevation = ButtonDefaults.buttonElevation(1.dp)
@@ -213,12 +203,12 @@ fun AuthScreen(
                             text = "المتابعة باستخدام Google",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = TextDark
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
 
-                // Email Form (Expandable)
+                // Email Form (Direct Alternative)
                 if (showEmailForm) {
                     OutlinedTextField(
                         value = email,
@@ -245,74 +235,41 @@ fun AuthScreen(
                                 errorMessage = "يرجى إدخال بريد صالح وكلمة مرور لا تقل عن 6 أحرف"
                                 return@Button
                             }
-                            errorMessage = null
                             isLoading = true
-                            FirebaseAuth.getInstance()
-                                .signInWithEmailAndPassword(email.trim(), password)
+                            errorMessage = null
+                            FirebaseAuth.getInstance().signInWithEmailAndPassword(email.trim(), password)
                                 .addOnCompleteListener { task ->
-                                    isLoading = false
-                                    if (task.isSuccessful) {
+                                    if (task.isSuccessful && FirebaseAuth.getInstance().currentUser != null) {
+                                        isLoading = false
                                         onAuthSuccess()
                                     } else {
-                                        errorMessage = task.exception?.localizedMessage
-                                            ?: "تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور."
+                                        // Attempt auto-register if account doesn't exist
+                                        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.trim(), password)
+                                            .addOnCompleteListener { regTask ->
+                                                isLoading = false
+                                                if (regTask.isSuccessful && FirebaseAuth.getInstance().currentUser != null) {
+                                                    onAuthSuccess()
+                                                } else {
+                                                    errorMessage = regTask.exception?.localizedMessage ?: "فشل تسجيل الدخول"
+                                                }
+                                            }
                                     }
                                 }
                         },
-                        enabled = !isLoading,
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = BrandNavy)
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandTeal)
                     ) {
-                        Text("تسجيل الدخول")
-                    }
-
-                    OutlinedButton(
-                        onClick = {
-                            if (email.isBlank() || password.length < 6) {
-                                errorMessage = "يرجى إدخال بريد صالح وكلمة مرور لا تقل عن 6 أحرف"
-                                return@OutlinedButton
-                            }
-                            errorMessage = null
-                            isLoading = true
-                            FirebaseAuth.getInstance()
-                                .createUserWithEmailAndPassword(email.trim(), password)
-                                .addOnCompleteListener { task ->
-                                    isLoading = false
-                                    if (task.isSuccessful) {
-                                        onAuthSuccess()
-                                    } else {
-                                        errorMessage = task.exception?.localizedMessage
-                                            ?: "تعذر إنشاء الحساب."
-                                    }
-                                }
-                        },
-                        enabled = !isLoading,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("إنشاء حساب جديد")
+                        Text("تسجيل الدخول / إنشاء حساب جديد", fontWeight = FontWeight.Bold)
                     }
                 } else {
                     TextButton(onClick = { showEmailForm = true }) {
-                        Text("أو تسجيل الدخول عبر البريد الإلكتروني", fontSize = 12.sp, color = BrandNavy)
+                        Text("أو التسجيل عبر البريد الإلكتروني", fontSize = 12.sp, color = BrandTeal)
                     }
                 }
 
-                // Offline Guest Mode Button
-                OutlinedButton(
-                    onClick = onContinueOffline,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = BrandTeal)
-                ) {
-                    Text(
-                        text = "المتابعة في الوضع المحلي (100% دون إنترنت)",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                if (isLoading) {
+                    CircularProgressIndicator(color = BrandTeal, modifier = Modifier.size(28.dp))
                 }
 
                 if (errorMessage != null) {
@@ -324,12 +281,12 @@ fun AuthScreen(
                     )
                 }
 
-                // Security & Privacy Guarantee Notice
+                // Security & Privacy Notice
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(BgContainerMint)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -341,9 +298,9 @@ fun AuthScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
-                        text = "بياناتك الصحية محفوظة محلياً في مساحة التخزين المعزولة الخاصة بالتطبيق على جهازك دون مشاركتها مع أي طرف ثالث.",
+                        text = "بياناتك الصحية محمية محلياً في مساحة التخزين الخاصة بالتطبيق وتعمل دون إنترنت فور تسجيل الدخول.",
                         fontSize = 10.sp,
-                        color = BrandNavy,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 14.sp
                     )
                 }
