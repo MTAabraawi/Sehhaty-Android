@@ -121,8 +121,8 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     // Google Play Services & AdMob
-    implementation(libs.play-services-auth)
-    implementation(libs.play-services-ads)
+    implementation(libs.play.services.auth)
+    implementation(libs.play.services.ads)
 
     // Unit Testing
     testImplementation(libs.junit)

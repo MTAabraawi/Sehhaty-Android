@@ -28,3 +28,9 @@ val StatusSuccess = Color(0xFF10B981)
 val StatusWarning = Color(0xFFF59E0B)
 val StatusDanger = Color(0xFFEF4444)
 val StatusInfo = Color(0xFF0284C7)
+
+// Backward compatibility aliases for existing screens
+val TealPrimary = BrandTeal
+val TealDark = BrandNavy
+val TextSecondary = TextMuted
+val CardSurface = BgCard
