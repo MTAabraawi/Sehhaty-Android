@@ -2,9 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
 }
 
 // Safely apply google-services only if google-services.json exists
+// This guarantees successful builds even before Firebase credentials are added by user
 if (file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
 }
@@ -25,12 +27,13 @@ android {
             useSupportLibrary = true
         }
 
-        // Official Google AdMob App ID (Default Test ID for safe local development)
+        // AdMob Official Test App ID
         manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
     }
 
     signingConfigs {
         create("release") {
+            // Configured via environment variables / Gradle properties for GitHub Actions
             val keystorePath = System.getenv("KEYSTORE_PATH") ?: project.findProperty("KEYSTORE_PATH") as? String
             if (keystorePath != null && file(keystorePath).exists()) {
                 storeFile = file(keystorePath)
@@ -44,11 +47,7 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
-            // Keep package name identical to google-services.json
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
-            buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            applicationIdSuffix = ".debug"
         }
         release {
             isMinifyEnabled = true
@@ -57,12 +56,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Official Production AdMob IDs provided by MTA TECHNOLOGIES
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-8004171697196640~3905016525"
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-8004171697196640~3905016525\"")
-            buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-8004171697196640/3901147097\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-8004171697196640/4886925708\"")
-
+            // Use release signing config if available, fallback to debug for automated testing
             val releaseSigning = signingConfigs.getByName("release")
             if (releaseSigning.storeFile != null && releaseSigning.storeFile!!.exists()) {
                 signingConfig = releaseSigning
@@ -106,13 +100,15 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
 
-    // Room Database
+    // Room Database (Local Persistence)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    // Using runtime sqlite queries & room-compiler if needed
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.coroutines.play-services)
 
     // Firebase (BoM guarantees version compatibility)
     implementation(platform(libs.firebase.bom))
@@ -121,8 +117,8 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     // Google Play Services & AdMob
-    implementation(libs.play.services.auth)
-    implementation(libs.play.services.ads)
+    implementation(libs.play-services-auth)
+    implementation(libs.play-services-ads)
 
     // Unit Testing
     testImplementation(libs.junit)
