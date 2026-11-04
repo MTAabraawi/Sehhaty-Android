@@ -108,7 +108,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play-services)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Firebase (BoM guarantees version compatibility)
     implementation(platform(libs.firebase.bom))
@@ -117,8 +117,8 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     // Google Play Services & AdMob
-    implementation(libs.play-services-auth)
-    implementation(libs.play-services-ads)
+    implementation(libs.play.services.auth)
+    implementation(libs.play.services.ads)
 
     // Unit Testing
     testImplementation(libs.junit)
