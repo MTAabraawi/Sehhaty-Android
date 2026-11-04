@@ -11,15 +11,9 @@ class SupervisorRepository(private val supervisorDao: SupervisorDao) {
     suspend fun getSupervisorSync(userId: String): SupervisorEntity? =
         supervisorDao.getSupervisorSync(userId)
 
-    suspend fun saveSupervisor(supervisor: SupervisorEntity, activeUserId: String): Long {
-        require(activeUserId.isNotBlank()) { "No active user session" }
-        require(supervisor.userId == activeUserId) { "Supervisor does not belong to the active user" }
-        return supervisorDao.saveSupervisor(supervisor)
-    }
+    suspend fun saveSupervisor(supervisor: SupervisorEntity): Long =
+        supervisorDao.saveSupervisor(supervisor)
 
-    suspend fun deleteSupervisor(supervisor: SupervisorEntity, activeUserId: String): Int {
-        require(activeUserId.isNotBlank()) { "No active user session" }
-        require(supervisor.userId == activeUserId) { "Supervisor does not belong to the active user" }
-        return supervisorDao.deleteSupervisor(supervisor.id, activeUserId)
-    }
+    suspend fun deleteSupervisor(supervisor: SupervisorEntity) =
+        supervisorDao.deleteSupervisor(supervisor)
 }

@@ -2,7 +2,7 @@
     <string name="app_name">صحتي</string>
     <string name="company_name">MTA TECHNOLOGIES</string>
     <string name="tagline">رفيقك الصحي الموثوق لتنظيم الأدوية والجرعات</string>
-
+    
     <!-- Auth & Welcome -->
     <string name="sign_in_google">تسجيل الدخول باستخدام Google</string>
     <string name="sign_in_guest">المتابعة في الوضع المحلي (بدون إنترنت)</string>

@@ -23,13 +23,13 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DoseHistoryScreen(userId: String) {
+fun DoseHistoryScreen() {
     val repository = remember {
         val db = SehhatyApp.instance.database
-        MedicationRepository(db, db.medicationDao(), db.doseDao())
+        MedicationRepository(db.medicationDao(), db.doseDao())
     }
 
-    val historyLogs by repository.getDoseHistory(userId).collectAsState(initial = emptyList())
+    val historyLogs by repository.getDoseHistory("local_user").collectAsState(initial = emptyList())
     val dateFormat = remember { SimpleDateFormat("yyyy/MM/dd - hh:mm a", Locale("ar")) }
 
     Scaffold(

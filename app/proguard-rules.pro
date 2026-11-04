@@ -14,3 +14,13 @@
 
 # Keep models & domain classes
 -keep class com.mtaapps.sehhaty.data.model.** { *; }
+
+# Room Database: Preserve RoomDatabase and generated _Impl classes
+-keep class * extends androidx.room.RoomDatabase {
+    <init>();
+}
+-keep class com.mtaapps.sehhaty.data.local.** { *; }
+-keepclassmembers class * extends androidx.room.RoomDatabase {
+    *;
+}
+-dontwarn androidx.room.paging.**

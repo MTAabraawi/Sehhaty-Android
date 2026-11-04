@@ -17,9 +17,3 @@ local.properties
 *.jks
 *.keystore
 secrets.properties
-
-# Local Firebase backup - never upload
-/app/google-services-before-oauth-backup.json
-
-# Local review backups - never upload
-*.before-*

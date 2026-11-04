@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import com.mtaapps.sehhaty.SehhatyApp
 import com.mtaapps.sehhaty.data.local.entity.DoseStatus
-import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import com.mtaapps.sehhaty.supervisor.SupervisorAlertManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,15 +33,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val activeUserId = FirebaseSyncService.getActiveUserId(context)
-                if (activeUserId == null) {
-                    Log.w("AlarmReceiver", "No active session. Ignoring dose alarm $doseId.")
-                    alarmScheduler.cancelRepeatAlarm(doseId)
-                    NotificationHelper.cancelNotification(context, doseId.toInt())
-                    return@launch
-                }
-
-                val dose = database.doseDao().getDoseById(doseId, activeUserId)
+                val dose = database.doseDao().getDoseById(doseId)
                 if (dose == null) {
                     Log.w("AlarmReceiver", "Dose $doseId not found in database. Cancelling alarm.")
                     alarmScheduler.cancelRepeatAlarm(doseId)
@@ -50,10 +41,18 @@ class AlarmReceiver : BroadcastReceiver() {
                     return@launch
                 }
 
+                // A paused or deleted medication must not continue producing reminders.
+                val medication = database.medicationDao().getMedicationById(dose.medicationId)
+                if (medication == null || medication.isPaused) {
+                    alarmScheduler.cancelAllDoseAlarms(doseId)
+                    NotificationHelper.cancelNotification(context, doseId.toInt())
+                    return@launch
+                }
+
                 // If user already confirmed taking the dose, stop repeating immediately!
                 if (dose.status == DoseStatus.CONFIRMED) {
                     Log.i("AlarmReceiver", "Dose $doseId already confirmed. Cancelling repeats.")
-                    alarmScheduler.cancelRepeatAlarm(doseId)
+                    alarmScheduler.cancelAllDoseAlarms(doseId)
                     NotificationHelper.cancelNotification(context, doseId.toInt())
                     return@launch
                 }
@@ -64,11 +63,8 @@ class AlarmReceiver : BroadcastReceiver() {
                 if (currentRepeats >= MAX_REPEAT_COUNT) {
                     Log.i("AlarmReceiver", "Max reminder repeats ($MAX_REPEAT_COUNT) reached for dose $doseId.")
                     alarmScheduler.cancelRepeatAlarm(doseId)
-                    database.doseDao().updateScheduleState(
-                        id = dose.id,
-                        userId = dose.userId,
-                        status = DoseStatus.UNCONFIRMED,
-                        supervisorAlerted = dose.supervisorAlerted
+                    database.doseDao().updateSchedule(
+                        dose.copy(status = DoseStatus.UNCONFIRMED)
                     )
                     // Escalate to family supervisor if configured
                     SupervisorAlertManager.checkAndEscalateIfNeeded(
@@ -80,8 +76,9 @@ class AlarmReceiver : BroadcastReceiver() {
                     return@launch
                 }
 
-                // Increment repeat count
-                database.doseDao().incrementRepeat(doseId, activeUserId)
+                // Count this alert before deciding whether another repeat should be scheduled.
+                val nextRepeatCount = currentRepeats + 1
+                database.doseDao().incrementRepeat(doseId)
 
                 // Trigger High-Priority Alarm Notification with Take / Snooze Action Buttons
                 NotificationHelper.showDoseNotification(
@@ -92,7 +89,19 @@ class AlarmReceiver : BroadcastReceiver() {
                     isRepeat = isRepeat
                 )
 
-                // Schedule the next 2-minute reminder repeat
+                // Stop after exactly MAX_REPEAT_COUNT notifications; do not leave an extra alarm.
+                if (nextRepeatCount >= MAX_REPEAT_COUNT) {
+                    alarmScheduler.cancelRepeatAlarm(doseId)
+                    database.doseDao().updateSchedule(
+                        dose.copy(repeatCount = nextRepeatCount, status = DoseStatus.UNCONFIRMED)
+                    )
+                    SupervisorAlertManager.checkAndEscalateIfNeeded(
+                        context, doseId, dose.medicationName, dose.doseStrength
+                    )
+                    return@launch
+                }
+
+                // Schedule the next 2-minute reminder repeat.
                 alarmScheduler.scheduleRepeatAlarm(doseId, dose.medicationName, dose.doseStrength)
 
                 // Check supervisor escalation threshold (e.g. 30 minutes)
@@ -112,6 +121,6 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val MAX_REPEAT_COUNT = 15 // 15 repeats * 2 minutes = 30 minutes
+        const val MAX_REPEAT_COUNT = 15 // Maximum notification count, including the initial reminder.
     }
 }

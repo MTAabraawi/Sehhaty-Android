@@ -1,0 +1,23 @@
+مشروع صحتي - نسخة اختبار جاهزة للرفع
+Package: com.mtaapps.sehhaty
+الفرع المقصود: sehhaty-fixed-test فقط
+
+ما تم إعداده:
+- الاحتفاظ بملفات المشروع الكامل كما وردت في الأرشيف.
+- AuthScreen يستخدم R.drawable.ic_launcher_foreground، والمورد موجود ضمن res/drawable.
+- لم يتم استبدال HomeScreen بنسخة PolyDev؛ لا يوجد فيه مرجع mipmap الذي زعمت حزمة PolyDev إصلاحه.
+- إعداد Room الحالي يستخدم kotlin-kapt مع kapt(libs.androidx.room.compiler)، وإصدار Room 2.6.1. لم يتم تغييره إلى KSP لأن المشروع الحالي لا يعرّف KSP.
+- تحديث GitHub Actions ليعمل على push إلى sehhaty-fixed-test أو يدويًا، ويبني Debug APK ويرفعه كـ Artifact.
+- الاختبارات تعمل في مهمة مستقلة حتى لا يمنع فشلها إنتاج APK التجريبي.
+
+طريقة التجربة بعد رفع محتويات المجلد إلى جذر المستودع على فرع sehhaty-fixed-test:
+1) افتح GitHub > Actions > Sehhaty - Build Test APK.
+2) انتظر انتهاء مهمة Build installable Debug APK.
+3) افتح تشغيل workflow ثم Artifacts ونزّل Sehhaty-Debug-APK.
+4) فك الضغط وثبّت APK على الهاتف. نسخة Debug تستخدم لاحقة الحزمة .debug وقد تظهر كتطبيق منفصل عن النسخة العادية.
+
+تنبيه:
+- لم يتم إجراء build أو test محليًا هنا لعدم توفر Android SDK. لا تعتبر النسخة ناجحة قبل ظهور نتيجة GitHub Actions.
+- لا ترفع إلى main. ارفع إلى sehhaty-fixed-test فقط.
+- احتفظ بنسخة احتياطية من المستودع قبل استبدال الملفات.
+- ملف google-services.json الموجود في المشروع لم يتم تعديله. لا تنشره خارج مستودعك الخاص.

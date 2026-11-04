@@ -2,7 +2,7 @@
     <string name="app_name">Sehhaty</string>
     <string name="company_name">MTA TECHNOLOGIES</string>
     <string name="tagline">Your Trusted Medication &amp; Health Companion</string>
-
+    
     <!-- Auth & Welcome -->
     <string name="sign_in_google">Sign in with Google</string>
     <string name="sign_in_guest">Continue in Offline Mode</string>
@@ -10,7 +10,7 @@
     <string name="auth_offline_note">Offline mode: All data and reminders work 100% locally on your device.</string>
 
     <!-- Navigation -->
-    <string name="nav_home">Today’s Doses</string>
+    <string name="nav_home">Today\'s Doses</string>
     <string name="nav_search">Drug Search</string>
     <string name="nav_history">History</string>
     <string name="nav_supervisor">Family Care</string>
@@ -51,7 +51,7 @@
     <string name="camera_scan_leaflet">Scan Leaflet / Prescription</string>
     <string name="medical_disclaimer_title">Important Medical Disclaimer</string>
     <string name="medical_disclaimer_body">This information is for guidance based on official drug formularies. It does NOT replace medical consultation with your doctor or pharmacist. Never change or stop prescribed doses without professional consultation.</string>
-
+    
     <!-- Settings -->
     <string name="battery_optimization_title">Battery Optimization Settings</string>
     <string name="battery_optimization_desc">To ensure reminders trigger precisely every 2 minutes when due, allow Sehhaty to run unrestricted in battery settings.</string>

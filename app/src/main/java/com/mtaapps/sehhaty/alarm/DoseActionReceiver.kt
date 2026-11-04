@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.mtaapps.sehhaty.SehhatyApp
-import com.mtaapps.sehhaty.data.remote.FirebaseSyncService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,13 +34,7 @@ class DoseActionReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Fetch the actual verified dose record from DB to guarantee correct medicationId
-                val activeUserId = FirebaseSyncService.getActiveUserId(context)
-                if (activeUserId == null) {
-                    Log.w("DoseActionReceiver", "No active session. Ignoring dose action $doseId.")
-                    return@launch
-                }
-
-                val dose = database.doseDao().getDoseById(doseId, activeUserId)
+                val dose = database.doseDao().getDoseById(doseId)
                 if (dose == null) {
                     Log.w("DoseActionReceiver", "Dose $doseId not found in database.")
                     return@launch
@@ -49,21 +42,21 @@ class DoseActionReceiver : BroadcastReceiver() {
 
                 when (action) {
                     ACTION_TAKE_DOSE -> {
-                        // 1. Cancel all repeat alarms for this dose
-                        scheduler.cancelRepeatAlarm(doseId)
+                        // Cancel both the scheduled dose alarm and any pending repeats.
+                        scheduler.cancelAllDoseAlarms(doseId)
 
                         // 2. Dismiss the notification
                         NotificationHelper.cancelNotification(context, doseId.toInt())
 
                         // 3. Atomically confirm dose and insert permanent history log using verified DB data
-                        val confirmed = database.doseDao().confirmDoseAndLog(doseId, activeUserId)
+                        val confirmed = database.doseDao().confirmDoseAndLog(doseId)
                         Log.i("DoseActionReceiver", "Dose $doseId confirmed and logged: $confirmed")
                     }
 
                     ACTION_SNOOZE -> {
                         // 1. Dismiss notification and cancel current repeating alarm
                         NotificationHelper.cancelNotification(context, doseId.toInt())
-                        scheduler.cancelRepeatAlarm(doseId)
+                        scheduler.cancelAllDoseAlarms(doseId)
 
                         // 2. Reschedule reminder 10 minutes from now using verified DB names
                         val snoozeTrigger = System.currentTimeMillis() + 10 * 60 * 1000L

@@ -22,22 +22,6 @@ object FirebaseSyncService {
     val currentUserId: String?
         get() = if (isFirebaseConfigured) FirebaseAuth.getInstance().currentUser?.uid else null
 
-    /**
-     * Returns the active authenticated Firebase user or explicitly enabled local session.
-     * Returns null when no valid session exists.
-     */
-    fun getActiveUserId(context: Context): String? {
-        val firebaseUserId = currentUserId
-        if (!firebaseUserId.isNullOrBlank()) return firebaseUserId
-
-        val preferences = context.getSharedPreferences("sehhaty_session", Context.MODE_PRIVATE)
-        return if (preferences.getBoolean("local_mode_enabled", false)) {
-            "local_user"
-        } else {
-            null
-        }
-    }
-
     suspend fun syncUserData(context: Context, userId: String): Result<Boolean> {
         if (!isFirebaseConfigured || userId == "local_user") {
             return Result.success(false) // Offline mode; local Room database used
