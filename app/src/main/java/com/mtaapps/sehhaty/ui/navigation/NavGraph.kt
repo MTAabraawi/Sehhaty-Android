@@ -110,6 +110,11 @@ fun AppNavGraph() {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Auth.route) { inclusive = true }
                         }
+                    },
+                    onContinueOffline = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Auth.route) { inclusive = true }
+                        }
                     }
                 )
             }
