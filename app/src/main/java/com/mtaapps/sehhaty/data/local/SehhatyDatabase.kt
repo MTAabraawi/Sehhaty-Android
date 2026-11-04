@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mtaapps.sehhaty.data.local.dao.*
+import com.mtaapps.sehhaty.data.local.converters.DoseStatusConverters
 import com.mtaapps.sehhaty.data.local.entity.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
  * - Safe migration: NO destructive migrations so patient records are never wiped.
  * - Robust data seeding: Uses database instance directly after build to avoid null INSTANCE race conditions.
  */
+@TypeConverters(DoseStatusConverters::class)
 @Database(
     entities = [
         MedicationEntity::class,

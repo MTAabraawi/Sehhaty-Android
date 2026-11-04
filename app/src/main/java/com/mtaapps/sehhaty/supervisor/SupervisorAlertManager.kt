@@ -26,8 +26,8 @@ object SupervisorAlertManager {
         doseStrength: String
     ) {
         val database = SehhatyApp.instance.database
-        val supervisor = database.supervisorDao().getSupervisorSync("local_user") ?: return
         val dose = database.doseDao().getDoseById(doseId) ?: return
+        val supervisor = database.supervisorDao().getSupervisorSync(dose.userId) ?: return
 
         if (!supervisor.isActive || !supervisor.consentGiven) return
         if (dose.status == DoseStatus.CONFIRMED || dose.supervisorAlerted) return

@@ -273,7 +273,7 @@ fun HomeScreen(
                                     doseStrength = dose.doseStrength,
                                     scheduledTime = dose.scheduledTimeTimestamp
                                 )
-                                AlarmScheduler(context).cancelRepeatAlarm(dose.id)
+                                AlarmScheduler(context).cancelAllDoseAlarms(dose.id)
                                 NotificationHelper.cancelNotification(context, dose.id.toInt())
                             }
                         }

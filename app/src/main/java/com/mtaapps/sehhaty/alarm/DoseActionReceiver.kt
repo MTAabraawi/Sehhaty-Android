@@ -42,8 +42,8 @@ class DoseActionReceiver : BroadcastReceiver() {
 
                 when (action) {
                     ACTION_TAKE_DOSE -> {
-                        // 1. Cancel all repeat alarms for this dose
-                        scheduler.cancelRepeatAlarm(doseId)
+                        // Cancel both the scheduled dose alarm and any pending repeats.
+                        scheduler.cancelAllDoseAlarms(doseId)
 
                         // 2. Dismiss the notification
                         NotificationHelper.cancelNotification(context, doseId.toInt())
@@ -56,7 +56,7 @@ class DoseActionReceiver : BroadcastReceiver() {
                     ACTION_SNOOZE -> {
                         // 1. Dismiss notification and cancel current repeating alarm
                         NotificationHelper.cancelNotification(context, doseId.toInt())
-                        scheduler.cancelRepeatAlarm(doseId)
+                        scheduler.cancelAllDoseAlarms(doseId)
 
                         // 2. Reschedule reminder 10 minutes from now using verified DB names
                         val snoozeTrigger = System.currentTimeMillis() + 10 * 60 * 1000L

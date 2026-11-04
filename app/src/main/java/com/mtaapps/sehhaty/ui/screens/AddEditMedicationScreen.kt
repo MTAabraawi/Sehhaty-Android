@@ -461,7 +461,22 @@ fun AddEditMedicationScreen(onSaved: () -> Unit) {
                             // Step 5: Save to Database & Activate Exact Alarms
                             coroutineScope.launch {
                                 val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "local_user"
-                                val sortedCsv = doseTimesList.sortedBy { it.toTotalMinutes() }.joinToString(",") { it.to24hString() }
+                                val orderedTimes = doseTimesList.sortedBy { it.toTotalMinutes() }
+                                val sortedCsv = orderedTimes.joinToString(",") { it.to24hString() }
+                                if (orderedTimes.map { it.to24hString() }.distinct().size != orderedTimes.size) {
+                                    Toast.makeText(context, "يرجى اختيار أوقات مختلفة لكل جرعة", Toast.LENGTH_LONG).show()
+                                    return@launch
+                                }
+                                val startDate = System.currentTimeMillis()
+                                val endDate = when (durationWeeks) {
+                                    "أسبوع واحد (مضادات حيوية)" -> startDate + 7L * 24 * 60 * 60 * 1000
+                                    "أسبوعين" -> startDate + 14L * 24 * 60 * 60 * 1000
+                                    "شهر واحد" -> java.util.Calendar.getInstance().apply {
+                                        timeInMillis = startDate
+                                        add(java.util.Calendar.MONTH, 1)
+                                    }.timeInMillis
+                                    else -> null
+                                }
 
                                 val medId = repository.addMedication(
                                     MedicationEntity(
@@ -472,6 +487,8 @@ fun AddEditMedicationScreen(onSaved: () -> Unit) {
                                         instructions = instruction,
                                         timesPerDay = timesPerDay,
                                         doseTimesCsv = sortedCsv,
+                                        startDateTimestamp = startDate,
+                                        endDateTimestamp = endDate,
                                         userId = currentUid
                                     )
                                 )

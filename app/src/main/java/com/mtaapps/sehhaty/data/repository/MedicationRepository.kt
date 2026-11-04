@@ -80,7 +80,7 @@ class MedicationRepository(
     private suspend fun generateDoseSchedulesForMedication(medication: MedicationEntity) {
         if (medication.isPaused) return
 
-        val times = medication.doseTimesCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        val times = medication.doseTimesCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }.distinct()
         val schedules = mutableListOf<DoseScheduleEntity>()
         val today = Calendar.getInstance()
 
@@ -102,8 +102,9 @@ class MedicationRepository(
             for (timeStr in times) {
                 val parts = timeStr.split(":")
                 if (parts.size == 2) {
-                    val hour = parts[0].toIntOrNull() ?: 8
-                    val minute = parts[1].toIntOrNull() ?: 0
+                    val hour = parts[0].toIntOrNull() ?: continue
+                    val minute = parts[1].toIntOrNull() ?: continue
+                    if (hour !in 0..23 || minute !in 0..59) continue
                     val doseCal = Calendar.getInstance().apply {
                         timeInMillis = dayCal.timeInMillis
                         set(Calendar.HOUR_OF_DAY, hour)

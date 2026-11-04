@@ -7,20 +7,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DrugReferenceDao {
 
-    @Query("SELECT * FROM drug_reference ORDER BY tradeNameAr ASC")
+    @Query("SELECT * FROM drug_references ORDER BY tradeNameAr ASC")
     fun getAllDrugs(): Flow<List<DrugReferenceEntity>>
 
-    @Query("SELECT COUNT(*) FROM drug_reference")
+    @Query("SELECT COUNT(*) FROM drug_references")
     suspend fun countDrugs(): Int
 
-    @Query("SELECT * FROM drug_reference WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM drug_references WHERE id = :id LIMIT 1")
     suspend fun getDrugById(id: Long): DrugReferenceEntity?
 
     @Query("""
-        SELECT * FROM drug_reference 
-        WHERE tradeNameAr LIKE '%' || :query || '%' 
-           OR tradeNameEn LIKE '%' || :query || '%' 
-           OR scientificName LIKE '%' || :query || '%' 
+        SELECT * FROM drug_references
+        WHERE tradeNameAr LIKE '%' || :query || '%'
+           OR tradeNameEn LIKE '%' || :query || '%'
+           OR scientificName LIKE '%' || :query || '%'
            OR activeIngredient LIKE '%' || :query || '%'
         ORDER BY tradeNameAr ASC
     """)

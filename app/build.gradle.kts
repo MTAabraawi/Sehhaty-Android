@@ -29,6 +29,8 @@ android {
 
         // AdMob Official Test App ID
         manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+        buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
     }
 
     signingConfigs {
@@ -55,6 +57,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-8004171697196640~3905016525"
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-8004171697196640/3901147097\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-8004171697196640/4886925708\"")
             // Use release signing config if available, fallback to debug for automated testing
             val releaseSigning = signingConfigs.getByName("release")
             if (releaseSigning.storeFile != null && releaseSigning.storeFile!!.exists()) {
